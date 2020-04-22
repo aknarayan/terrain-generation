@@ -3,6 +3,13 @@ using UnityEngine;
 
 public class MapGenerator : MonoBehaviour {
 
+  public enum DrawMode {
+    NoiseMap,
+    ColourMap
+  }
+
+  public DrawMode drawMode;
+
   public int mapWidth;
   public int mapHeight;
   public float noiseScale;
@@ -17,11 +24,30 @@ public class MapGenerator : MonoBehaviour {
 
   public bool autoUpdate;
 
+  public TerrainType[] regions;
+
   public void GenerateMap() {
     float[,] noiseMap = Noise.GenerateNoiseMap(mapWidth, mapHeight, seed, noiseScale, octaves, persistence, lacunarity, offset);
 
+    Color[] colourMap = new Color[mapWidth * mapHeight];
+    for (int y = 0; y < mapHeight; y++) {
+      for (int x = 0; x < mapWidth; x++) {
+        float currentHeight = noiseMap[x, y];
+        foreach (TerrainType region in regions) {
+          if (currentHeight <= region.height) {
+            colourMap[y * mapWidth + x] = region.colour;
+            break;
+          }
+        }
+      }
+    }
+
     MapDisplay display = FindObjectOfType<MapDisplay>();
-    display.DrawNoiseMap(noiseMap);
+    if (drawMode == DrawMode.NoiseMap) {
+      display.DrawTexture(TextureGenerator.textureFromHeightMap(noiseMap));
+    } else if (drawMode == DrawMode.ColourMap) {
+      display.DrawTexture(TextureGenerator.textureFromColourMap(colourMap, mapWidth, mapHeight));
+    }
   }
 
   private void OnValidate() {
@@ -42,4 +68,11 @@ public class MapGenerator : MonoBehaviour {
     }
   }
 
+}
+
+[System.Serializable]
+public struct TerrainType {
+  public string name;
+  public float height;
+  public Color colour;
 }
