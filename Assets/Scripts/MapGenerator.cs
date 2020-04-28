@@ -11,7 +11,7 @@ public class MapGenerator : MonoBehaviour {
 
   public DrawMode drawMode;
 
-  const int mapChunkSize = 241; // 240 is a multiple of all even numbers in range [1, 12]
+  public const int mapChunkSize = 241; // 240 is a multiple of all even numbers in range [1, 12]
   [Range(0, 6)]
   public int levelOfDetail;
   public float noiseScale;
