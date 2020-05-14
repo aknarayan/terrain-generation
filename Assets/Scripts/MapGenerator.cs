@@ -13,6 +13,8 @@ public class MapGenerator : MonoBehaviour {
 
   public DrawMode drawMode;
 
+  public Noise.NormaliseMode normaliseMode;
+
   public const int mapChunkSize = 241; // 240 is a multiple of all even numbers in range [1, 12]
   [Range(0, 6)]
   public int editorPreviewLOD;
@@ -99,15 +101,16 @@ public class MapGenerator : MonoBehaviour {
   }
 
   MapData GenerateMapData(Vector2 centre) {
-    float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistence, lacunarity, centre + offset);
+    float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistence, lacunarity, centre + offset, normaliseMode);
 
     Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
     for (int y = 0; y < mapChunkSize; y++) {
       for (int x = 0; x < mapChunkSize; x++) {
         float currentHeight = noiseMap[x, y];
         foreach (TerrainType region in regions) {
-          if (currentHeight <= region.height) {
+          if (currentHeight >= region.height) {
             colourMap[y * mapChunkSize + x] = region.colour;
+          } else {
             break;
           }
         }
