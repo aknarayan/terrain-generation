@@ -16,7 +16,7 @@ public class MapGenerator : MonoBehaviour {
 
   public Noise.NormaliseMode normaliseMode;
 
-  public const int mapChunkSize = 241; // 240 is a multiple of all even numbers in range [1, 12]
+  public const int mapChunkSize = 239; // 240 is a multiple of all even numbers in range [1, 12]
   [Range(0, 6)]
   public int editorPreviewLOD;
   public float noiseScale;
@@ -112,7 +112,7 @@ public class MapGenerator : MonoBehaviour {
   }
 
   MapData GenerateMapData(Vector2 centre) {
-    float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistence, lacunarity, centre + offset, normaliseMode);
+    float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, seed, noiseScale, octaves, persistence, lacunarity, centre + offset, normaliseMode);
 
     Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
     for (int y = 0; y < mapChunkSize; y++) {
