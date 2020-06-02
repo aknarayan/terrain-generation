@@ -2,7 +2,8 @@
 {
   Properties
   {
-
+	testTexture("Texture", 2D) = "white"{}
+	testScale("Scale", Float) = 1
   }
   SubShader
   {
@@ -27,9 +28,13 @@
     float minHeight;
 	float maxHeight;
 
+	sampler2D testTexture;
+	float testScale;
+
     struct Input
 	{
 	  float3 worldPos;
+	  float3 worldNormal;
 	};
 
 	// Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
@@ -49,6 +54,16 @@
 		float drawStrength = inverseLerp(- baseBlends[i] / 2 - epsilon, baseBlends[i] / 2, heightPercent - baseStartHeights[i]);
 		o.Albedo = o.Albedo * (1 - drawStrength) + baseColours[i] * drawStrength;
 	  }
+
+	  float3 scaledWorldPos = IN.worldPos / testScale;
+	  float3 blendAxes = abs(IN.worldNormal);
+	  blendAxes /= blendAxes.x + blendAxes.y + blendAxes.z;
+	  float3 xProjection = tex2D(testTexture, scaledWorldPos.yz) * blendAxes.x;
+	  float3 yProjection = tex2D(testTexture, scaledWorldPos.xz) * blendAxes.y;
+	  float3 zProjection = tex2D(testTexture, scaledWorldPos.xy) * blendAxes.z;
+
+	  o.Albedo = xProjection + yProjection + zProjection;
+
 	}
 	ENDCG
   }
