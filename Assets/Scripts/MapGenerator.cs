@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using UnityEngine;
 
@@ -30,6 +29,11 @@ public class MapGenerator : MonoBehaviour {
   Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
   Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
 
+  private void Awake() {
+    textureData.ApplyToMaterial(terrainMaterial);
+    textureData.UpdateMeshHeights(terrainMaterial, terrainData.minHeight, terrainData.maxHeight);
+  }
+
   void OnValuesUpdated() {
     if (!Application.isPlaying) {
       DrawMapInEditor();
@@ -47,6 +51,8 @@ public class MapGenerator : MonoBehaviour {
   }
 
   public void DrawMapInEditor() {
+    textureData.UpdateMeshHeights(terrainMaterial, terrainData.minHeight, terrainData.maxHeight);
+
     MapData mapData = GenerateMapData(Vector2.zero);
 
     MapDisplay display = FindObjectOfType<MapDisplay>();
@@ -124,9 +130,6 @@ public class MapGenerator : MonoBehaviour {
         }
       }
     }
-
-    textureData.UpdateMeshHeights(terrainMaterial, terrainData.minHeight, terrainData.maxHeight);
-
     return new MapData(noiseMap);
   }
 
